@@ -16,15 +16,41 @@ import java.util.Map;
 public class JsonEventIntercepterTest {
 
     @Test
+    public void testMessageMissingField(){
+        String body = "{"+
+                "\"provider\":\"min-29-9051-usnj-dev\"," +
+                "\"origin\":\"portscan\"," +
+                "\"src\":{" +
+                "\"ip\":\"23.58.195.116\"," +
+                "\"port\":80," +
+                "\"protocol\":\"tcp\"" +
+                "}," +
+
+                "\"ts\":1446504620000," +
+                "}";
+
+        Interceptor.Builder builder = new JsonEventIntercepter.Builder();
+        builder.configure(new Context());
+        Interceptor interceptor = builder.build();
+
+        Event event = EventBuilder.withBody(body, Charsets.UTF_8);
+
+        event = interceptor.intercept(event);
+        Map<String,String> headers = event.getHeaders();
+        Assert.assertEquals(headers.get(JsonEventIntercepter.Constants.JOBID), JsonEventIntercepter.Constants.DEFAULT);
+        Assert.assertEquals(headers.get(JsonEventIntercepter.Constants.CLIENTID), JsonEventIntercepter.Constants.DEFAULT);
+        Assert.assertEquals(headers.get(JsonEventIntercepter.Constants.RESULTYPE),JsonEventIntercepter.Constants.DEFAULT);
+    }
+
+    @Test
     public void testMessage1() {
         final String jobid = "jobid";
         final String clientid = "clientid";
         final String resultType = "result_type";
         String body = newBody(jobid, clientid, resultType);
-        Context context = new Context();
 
         Interceptor.Builder builder = new JsonEventIntercepter.Builder();
-        builder.configure(context);
+        builder.configure(new Context());
         Interceptor interceptor = builder.build();
 
         Event event = EventBuilder.withBody(body, Charsets.UTF_8);

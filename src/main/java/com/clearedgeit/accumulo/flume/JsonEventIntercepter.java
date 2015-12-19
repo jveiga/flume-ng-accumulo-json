@@ -1,6 +1,5 @@
 package com.clearedgeit.accumulo.flume;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import org.apache.flume.Context;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -59,10 +58,13 @@ public class JsonEventIntercepter implements Interceptor {
     }
 
     private @Nullable String getParameter(final String parameter, final JSONObject object) throws FailedToParseObjectException {
-        String value = null;
+        String value;
 
         try {
             value = (String) object.get(parameter);
+            if (null == value){
+                value = Constants.DEFAULT;
+            }
         } catch (ClassCastException e) {
               throw new FailedToParseObjectException(parameter);
 //            return "";
@@ -104,5 +106,6 @@ public class JsonEventIntercepter implements Interceptor {
         static final String JOBID = "job_id";
         static final String CLIENTID = "client_id";
         static final String RESULTYPE = "result_type";
+        static final String DEFAULT = "default";
     }
 }
